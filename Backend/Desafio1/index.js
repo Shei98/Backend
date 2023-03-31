@@ -29,7 +29,12 @@ class Product {
   }
 
   getProductById() {
-
+   try {
+        const obj = Product.find((obj) => obj.id === Product);
+        return obj ? obj : null;
+      } catch (err) {
+        console.log(err);
+      }
 
   }
 
