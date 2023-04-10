@@ -3,7 +3,6 @@ class ProductManager {
     this.products = [];
   }
 
-
 }
 
 class Product {
