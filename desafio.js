@@ -1,103 +1,81 @@
-const fs = require("fs");
+import { promises as fs } from 'fs'
 
-class Contenedor {
-  constructor(fileName) {
-    this._filename = fileName;
-    this._readFileOrCreateNewOne();
-  }
-
-  async _readFileOrCreateNewOne() {
-    try {
-      await fs.promises.readFile(this._filename, "utf-8");
-    } catch (error) {
-      error.code === "ENOENT"
-        ? this._createEmptyFile()
-        : console.log(
-            `Error Code: ${error.code} | There was an unexpected error when trying to read ${this._filename}`
-          );
+class ProductManager {
+    constructor(path) {
+        this.path = path
+        this.products = []
     }
-  }
 
-  async _createEmptyFile() {
-    fs.writeFile(this._filename, "[]", (error) => {
-      error
-        ? console.log(error)
-        : console.log(`File ${this._filename} was created since it didn't exist in the system`);
-    });
-  }
-
-  async getById(id) {
-    try {
-      const data = await this.getData();
-      const parsedData = JSON.parse(data);
-
-      return parsedData.find((producto) => producto.id === id);
-    } catch (error) {
-      console.log(
-        `Error Code: ${error.code} | There was an error when trying to get an element by its ID (${id})`
-      );
+    async addProduct(product) {
+        if (this.products.find(producto => producto.code == product.code)) {
+            return "Producto existente"
+        } else {
+            //Consultar el array del txt
+            this.products.push(product)
+            //Guardar en el txt
+            //Producto con este code no existe
+        }
     }
-  }
 
-  async deleteById(id) {
-    try {
-      const data = await this.getData();
-      const parsedData = JSON.parse(data);
-      const objectIdToBeRemoved = parsedData.find(
-        (producto) => producto.id === id
-      );
-
-      if (objectIdToBeRemoved) {
-        const index = parsedData.indexOf(objectIdToBeRemoved);
-        parsedData.splice(index, 1);
-        await fs.promises.writeFile(this._filename, JSON.stringify(parsedData));
-      } else {
-        console.log(`ID ${id} does not exist in the file`);
-        return null;
-      }
-    } catch (error) {
-      console.log(
-        `Error Code: ${error.code} | There was an error when trying to delete an element by its ID (${id})`
-      );
+    async getProducts() {
+        const products = await fs.readFile(this.path, 'utf-8')
+        const prods = JSON.parse(products)
+        console.log(prods)
     }
-  }
 
-  async save(object) {
-    try {
-      const allData = await this.getData();
-      const parsedData = JSON.parse(allData);
+    async getProductById(id) {
+        const product = this.products.find(producto => producto.id == id)
 
-      object.id = parsedData.length + 1;
-      parsedData.push(object);
+        if (product) { //Objeto o undefined
+            return product
+        }
 
-      await fs.promises.writeFile(this._filename, JSON.stringify(parsedData));
-      return object.id;
-    } catch (error) {
-      console.log(
-        `Error Code: ${error.code} | There was an error when trying to save an element`
-      );
+        return "Not Found"
     }
-  }
 
-  async deleteAll() {
-    try {
-      await this._createEmptyFile();
-    } catch (error) {
-      console.log(
-        `There was an error (${error.code}) when trying to delete all the objects`
-      );
+    async updateProduct() {
+
     }
-  }
 
-  async getData() {
-    const data = await fs.promises.readFile(this._filename, "utf-8");
-    return data;
-  }
+    async deleteProduct() {
 
-  async getAll() {
-    const data = await this.getData();
-    return JSON.parse(data);
-  }
+    }
+
+
 }
 
-module.exports = Contenedor;
+class Product {
+    constructor(title = "", description = "", price = 0, thumbnail = "", code = "", stock = 0) {
+        this.title = title
+        this.description = description
+        this.price = price
+        this.thumbnail = thumbnail
+        this.code = code
+        this.stock = stock
+        this.id = Product.incrementID()
+    }
+
+    static incrementID() {
+        if (this.idIncrement) { //Existe esta propiedad
+            this.idIncrement++
+        } else {
+            this.idIncrement = 1
+        }
+        return this.idIncrement
+    }
+}
+
+const product1 = new Product("Arroz", "Arroz", 150, "", "A123", 20)
+const product2 = new Product("Fideos", "Fideos", 250, "", "F123", 10)
+const product3 = new Product("Azucar", "Azucar", 320, "", "A456", 30)
+const product4 = new Product("Te", "Te", 120, "", "T123", 40)
+const product5 = new Product()
+
+const productManager = new ProductManager('./info.txt')
+/*productManager.addProduct(product1)
+productManager.addProduct(product2)
+console.log(productManager.addProduct(product1))
+console.log(productManager.getProductById(2))
+console.log(productManager.getProductById(5))
+*/
+await productManager.getProducts()
