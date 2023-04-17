@@ -36,13 +36,23 @@ class ProductManager {
         return "Not Found";
     }
 
+    
     async updateProduct(product) {
-        this.product.push(Product);
+        const RUTA_ARCHIVO = './info.txt'
+        // this.product.push(Product);
+        if (fs.existsSync(this.RUTA_ARCHIVO)){
+            let contenido = fs.readFileSync(RUTA_ARCHIVO, 'utf-8')
+            console.log(contenido);
+            fs.appendFileSync(RUTA_ARCHIVO, ` Nuevo producto `)
+        } else {
+            fs.writeFileSync(RUTA_ARCHIVO, "")
+        }
     }
 
     async deleteProduct() {
         try {
-            await this.fs.product.unlink(this.nombre);
+        const RUTA_ARCHIVO = './info.txt'
+            await this.fs.product.unlinkSync(this.nombre, RUTA_ARCHIVO), "";
             console.log("Borrado");
         } catch (error) {
             console.log("Error borrando: $(error)");
