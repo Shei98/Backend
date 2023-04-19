@@ -10,12 +10,14 @@ class ProductManager {
         if (this.products.find((producto) => producto.code == product.code)) {
             return "Producto existente";
         } else {
-            //Consultar el array del txt
-            this.products.push(product);
-            console.log(this.products, "--k");
-            await fs.writeFile(this.path, this.products, "utf-8");
-            //Guardar en el txt
-            //Producto con este code no existe
+            const productsJSON = JSON.stringify(product);
+            console.log(productsJSON);
+            let newId
+            productsJSON.length === 0 ? newId = 1 : newId = productsJSON[productsJSON.length - 1].id + 1;
+            const newObj = {...Object, id: newId};
+            productsJSON.push(newObj);
+            await this.writeFile(productsJSON)
+            return newObj.id;
         }
     }
 
@@ -39,7 +41,7 @@ class ProductManager {
     
     async updateProduct(product) {
         const RUTA_ARCHIVO = './info.txt'
-        // this.product.push(Product);
+         this.products.push(Product);
         if (fs.existsSync(this.RUTA_ARCHIVO)){
             let contenido = fs.readFileSync(RUTA_ARCHIVO, 'utf-8')
             console.log(contenido);
