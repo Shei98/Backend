@@ -1,3 +1,4 @@
+import { error } from "console";
 import { promises as fs } from "fs";
 
 class ProductManager {
@@ -6,18 +7,36 @@ class ProductManager {
         this.products = [];
     }
 
-    async addProduct(product) {
-        if (this.products.find((producto) => producto.code == product.code)) {
-            return "Producto existente";
-        } else {
-            const productsJSON = JSON.stringify(product);
-            console.log(productsJSON);
-            let newId
-            productsJSON.length === 0 ? newId = 1 : newId = productsJSON[productsJSON.length - 1].id + 1;
-            const newObj = {...Object, id: newId};
-            productsJSON.push(newObj);
-            await this.writeFile(productsJSON)
-            return newObj.id;
+    async addProduct(productos) {
+        // if (this.products.find((producto) => producto.code == product.code)) {
+        //     return "Producto existente";
+        // } else {
+        //     const productsJSON = JSON.stringify(product);
+        //     console.log(productsJSON);
+        //     let newId;
+        //     productsJSON.length === 0
+        //         ? (newId = 1)
+        //         : (newId = productsJSON[productsJSON.length - 1].id + 1);
+        //     const newObj = { ...Object, id: newId };
+        //     productsJSON.push(newObj);
+        //     await this.writeFile(productsJSON);
+        //     return newObj.id;
+        // }
+
+        const prod1 = { nombre: "Budin"}
+        const addProduct = async (ruta) =>{
+try{
+    await fs.writeFile(ruta, JSON.stringify(productos))
+    const contenido = await fs.readFile(ruta, 'utf-8')
+    const aux = JSON.parse(contenido)
+    aux.push(prod1)
+    console.log(aux)
+    await fs.writeFile(ruta, JSON.stringify(aux))
+    let contenido1= await fs.readFile(ruta, 'utf-8')
+    console.log(contenido1);;
+}catch (error){
+    return error
+}
         }
     }
 
@@ -38,27 +57,35 @@ class ProductManager {
         return "Not Found";
     }
 
-    
     async updateProduct(product) {
-        const RUTA_ARCHIVO = './info.txt'
-         this.products.push(Product);
-        if (fs.existsSync(this.RUTA_ARCHIVO)){
-            let contenido = fs.readFileSync(RUTA_ARCHIVO, 'utf-8')
+        const RUTA_ARCHIVO = "./info.txt";
+        this.products.push(Product);
+        const productos = [];
+        const consultasTXT = async (ruta) => {
+            await fs.writeFile(ruta, JSON.stringify(productos));
+            let contenido = await fs.readFile(ruta, "utf-8");
             console.log(contenido);
-            fs.appendFileSync(RUTA_ARCHIVO, ` Nuevo producto `)
-        } else {
-            fs.writeFileSync(RUTA_ARCHIVO, "")
-        }
+            await fs.appendFile(ruta, "Producto actualizado");
+            contenido = await fs.readFile(ruta, "utf-8");
+            console.log(contenido);
+        };
+
+        consultasTXT(RUTA_ARCHIVO);
     }
+    // if (fs.existsSync(this.RUTA_ARCHIVO)){
+    //     let contenido = fs.readFileSync(RUTA_ARCHIVO, 'utf-8')
+    //     console.log(contenido);
+    //     fs.appendFileSync(RUTA_ARCHIVO, ` Nuevo producto `)
+    // } else {
+    //     fs.writeFileSync(RUTA_ARCHIVO, "")
+    // }
 
     async deleteProduct() {
-        try {
-        const RUTA_ARCHIVO = './info.txt'
-            await this.fs.product.unlinkSync(this.nombre, RUTA_ARCHIVO), "";
+        const RUTA_ARCHIVO = "./info.txt";
+        const consultasTXT = async (ruta) => {
+            await fs.product.unlink(ruta);
             console.log("Borrado");
-        } catch (error) {
-            console.log("Error borrando: $(error)");
-        }
+        };
     }
 }
 
@@ -82,7 +109,6 @@ class Product {
 
     static incrementID() {
         if (this.idIncrement) {
-            //Existe esta propiedad
             this.idIncrement++;
         } else {
             this.idIncrement = 1;
