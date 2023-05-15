@@ -8,10 +8,13 @@ class ProductManager {
   async addProduct(product) {
     try {
       const products = await this.getProducts();
-      product.id = products.length + 1;
+      const lastProduct = products.slice(-1)[0];
+      if (lastProduct) {
+        product.id = lastProduct.id + 1;
+      }
       products.push(product);
       await this.saveProducts(products);
-      return product.id;
+      return product;
     } catch (error) {
       throw new Error('Error adding product: ' + error.message);
     }
@@ -23,7 +26,7 @@ class ProductManager {
       return JSON.parse(data);
     } catch (error) {
       if (error.code === 'ENOENT') {
-        console.log(error);
+        console.error(error);
         return [];
       }
       throw new Error('Error reading products: ' + error.message);
@@ -46,7 +49,7 @@ class ProductManager {
       if (index !== -1) {
         products[index] = { ...products[index], ...updatedFields };
         await this.saveProducts(products);
-        return true;
+        return products[index];
       }
       return false;
     } catch (error) {
