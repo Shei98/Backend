@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Lista de Productos en Tiempo Real</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/index.js"></script>
+</head>
+
+<body>
+    <h1>Lista de Productos en Tiempo Real</h1>
+    <ul id="productList">
+        {{#each products}}
+        <li id="{{this.id}}">{{this.title}} - {{this.description}}</li>
+        {{/each}}
+    </ul>
+</body>
+
+</html>

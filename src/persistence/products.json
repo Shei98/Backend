@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "title": "producto prueba",
+    "title": "producto prueba 1",
     "description": "Este es un producto prueba",
     "price": 200,
     "thumbnails": [],
@@ -79,25 +79,5 @@
     "thumbnails": [],
     "code": "abc123",
     "stock": 25
-  },
-  {
-    "id": 11,
-    "title": "producto re fachero",
-    "description": "Facherisimo",
-    "code": "abc123",
-    "price": 11111,
-    "status": true,
-    "stock": 25,
-    "thumbnailss": []
-  },
-  {
-    "id": 12,
-    "title": "producto recontra re mil fachero",
-    "description": "Facherisimo",
-    "code": "abc123",
-    "price": 11111,
-    "status": true,
-    "stock": 25,
-    "thumbnails": []
   }
 ]
