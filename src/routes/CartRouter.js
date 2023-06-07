@@ -1,8 +1,8 @@
 import { Router } from 'express';
+import { Cart as cartModel } from '../dao/models/Cart.js';
 
 class CartRouter {
-    constructor(cartManager) {
-        this.cartManager = cartManager;
+    constructor() {
         this.router = Router();
         this.initializeRoutes();
     }
@@ -15,17 +15,17 @@ class CartRouter {
 
     async createCart(req, res) {
         try {
-            const cart = await this.cartManager.createCart();
+            const cart = await cartModel.create({});
             res.json(cart);
         } catch (error) {
-            res.status(500).json({ error: 'Error al crear el carrito' });
+            res.status(500).json({ error: 'Error al crear el carrito', message: error.message });
         }
     }
 
     async getCartProducts(req, res) {
         try {
-            const cartId = parseInt(req.params.cid);
-            const cart = await this.cartManager.getCartById(cartId);
+            const cartId = req.params.cid;
+            const cart = await cartModel.findById(cartId);
 
             if (!cart) {
                 res.status(404).json({ error: 'Carrito no encontrado' });
@@ -33,24 +33,29 @@ class CartRouter {
                 res.json(cart.products);
             }
         } catch (error) {
-            res.status(500).json({ error: 'Error al obtener los productos del carrito' });
+            res.status(500).json({ error: 'Error al obtener los productos del carrito', message: error.message });
         }
     }
 
     async addProductToCart(req, res) {
         try {
-            const cartId = parseInt(req.params.cid);
-            const productId = parseInt(req.params.pid);
+            const cartId = req.params.cid;
+            const productId = req.params.pid;
             const quantity = parseInt(req.query.quantity) || 1;
 
-            const cart = await this.cartManager.addProductToCart(cartId, productId, quantity);
+            const cart = await cartModel.findByIdAndUpdate(
+                cartId,
+                { $push: { products: { productId, quantity } } },
+                { new: true }
+            );
+
             if (cart) {
                 res.json(cart);
             } else {
                 res.status(404).json({ error: 'Carrito no encontrado' });
             }
         } catch (error) {
-            res.status(500).json({ error: 'Error al agregar el producto al carrito' });
+            res.status(500).json({ error: 'Error al agregar el producto al carrito', message: error.message });
         }
     }
 }

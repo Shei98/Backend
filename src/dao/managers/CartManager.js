@@ -1,5 +1,5 @@
 import { promises } from 'fs';
-import Cart from '../model/Cart.js';
+import Cart from '../models/Cart.js';
 
 class CartManager {
     constructor(filePath) {

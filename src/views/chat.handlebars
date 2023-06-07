@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Chat</title>
+    {{!--
+    <link rel="stylesheet" type="text/css" href="styles.css"> --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/chat.js" defer></script>
+</head>
+
+<body>
+    <h1>Chat</h1>
+    <div id="messageLogs">
+        {{#each messages}}
+        <p id="{{this._id}}">[{{formatDate this.createdAt}}] - {{this.user}} dice: {{this.message}}</p>
+        {{/each}}
+    </div>
+    <div>
+        <input id="chatBox">
+    </div>
+
+</body>
+
+</html>
