@@ -17,25 +17,54 @@ class ProductRouter {
     }
 
     async getProducts(req, res) {
+        const { limit = 10, page = 1, sort, query } = req.query;
+
+        let filters = {};
+        if (query) {
+            filters = {
+                $or: [
+                    { title: { $regex: query, $options: 'i' } },
+                    { description: { $regex: query, $options: 'i' } },
+                    { category: { $regex: query, $options: 'i' } },
+                ],
+            };
+        }
+
+        const sortOptions = sort === 'asc' ? { price: 1 } : sort === 'desc' ? { price: -1 } : {};
+
         try {
-            const limit = parseInt(req.query.limit);
-            let products;
-            if (limit) {
-                const allProducts = await productModel.find();
-                products = allProducts.slice(0, parseInt(limit));
-            } else {
-                products = await productModel.find();
-            }
-            res.json(products);
+            const options = {
+                page: parseInt(page),
+                limit: parseInt(limit),
+                sort: sortOptions,
+            };
+
+            const { docs, totalPages, prevPage, nextPage, page: currentPage, hasNextPage, hasPrevPage } = await productModel.paginate(
+                filters,
+                options
+            );
+
+            res.json(Object.fromEntries(Object.entries({
+                status: 'success',
+                payload: docs,
+                totalPages,
+                prevPage,
+                nextPage,
+                page: currentPage,
+                hasPrevPage,
+                hasNextPage,
+                prevLink: hasPrevPage ? `/products?limit=${limit}&page=${prevPage}` : null,
+                nextLink: hasNextPage ? `/products?limit=${limit}&page=${nextPage}` : null,
+            }).filter(([k, v]) => v != null)));
         } catch (error) {
-            res.status(500).json({ error: 'Error al obtener los productos', message: error.message });
+            res.status(500).json({ status: 'error', error: 'Error al obtener los productos', message: error.message });
         }
     }
 
     async getProductById(req, res) {
         try {
             const productId = req.params.pid;
-            const product = await productModel.findById(productId);
+            const product = await productModel.findById(productId).exec();
 
             if (!product) {
                 res.status(404).json({ error: 'Producto no encontrado' });
@@ -71,7 +100,7 @@ class ProductRouter {
         try {
             const productId = req.params.pid;
             const fieldsToUpdate = req.body;
-            const updatedProduct = await productModel.findByIdAndUpdate(productId, fieldsToUpdate, { new: true });
+            const updatedProduct = await productModel.findByIdAndUpdate(productId, fieldsToUpdate, { new: true }).exec();
             if (updatedProduct) {
                 res.json(updatedProduct);
             } else {
@@ -85,7 +114,7 @@ class ProductRouter {
     async deleteProduct(req, res) {
         try {
             const productId = req.params.pid;
-            const deletedProduct = await productModel.findByIdAndDelete(productId);
+            const deletedProduct = await productModel.findByIdAndDelete(productId).exec();
             if (deletedProduct) {
                 res.json({ success: true });
                 const io = req.app.get('io');

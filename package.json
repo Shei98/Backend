@@ -17,6 +17,7 @@
     "handlebars-helpers": "^0.10.0",
     "moment": "^2.29.4",
     "mongoose": "^7.2.1",
+    "mongoose-paginate-v2": "^1.7.1",
     "socket.io": "^4.6.1",
     "sweetalert2": "^11.7.5"
   }
